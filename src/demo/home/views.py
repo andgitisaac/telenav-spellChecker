@@ -48,7 +48,7 @@ def index(request):
     return JsonResponse(json_obj)
 
 
-# @require_POST
+@require_POST
 def add_query(request):
     data = request.POST.get("data", None)
     if data:
