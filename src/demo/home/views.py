@@ -59,6 +59,3 @@ def add_query(request):
         return HttpResponse(status=201)
     
     return HttpResponse(status=400)
-
-
-
