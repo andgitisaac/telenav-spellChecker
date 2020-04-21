@@ -3,6 +3,7 @@ import datetime
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.utils import timezone
+import json
 
 from .models import UserQuery
 
@@ -35,7 +36,6 @@ def init_db(request):
 
 @require_GET
 def index(request):
-
     latest_queries = UserQuery.objects.order_by("query_date")
     queries = []
     for q in latest_queries:
@@ -47,15 +47,34 @@ def index(request):
     json_obj = {"queries": queries}
     return JsonResponse(json_obj)
 
+# from django.views.decorators.csrf import csrf_exempt
 
-@require_POST
+# @require_POST
+# @csrf_exempt
+@require_http_methods(["GET", "POST"]) # Temporarily available for GET.
 def add_query(request):
-    data = request.POST.get("data", None)
-    if data:
-        query = data.get("query")
-        query_date = timezone.now()
-        q = UserQuery(query=query, query_date=query_date)
-        q.save()
-        return HttpResponse(status=201)
-    
-    return HttpResponse(status=400)
+    if request.method == "GET":
+        query = request.GET.get("query", None)
+        if query:
+            json_obj = {
+                "query": query,
+                "query_date": timezone.now()
+            }
+            return JsonResponse(json_obj)
+        return HttpResponse(status=400)
+
+    elif request.method == "POST":
+        # data = request.POST.get("data", None) # Only works for form
+        data = request.body.decode("utf-8")     # Works for Json
+        data = json.loads(data)
+        if data:
+            query = data.get("query")
+            query_date = timezone.now()
+            q = UserQuery(query=query, query_date=query_date)
+            q.save()
+            return HttpResponse("Query Added!", status=201)
+        
+        return HttpResponse(status=400)
+
+    else:
+        return HttpResponse(status=405)
