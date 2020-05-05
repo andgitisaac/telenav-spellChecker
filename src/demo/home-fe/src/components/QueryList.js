@@ -1,42 +1,42 @@
 import React, { Component } from "react";
 import { Table } from "reactstrap";
-import NewStudentModal from "./NewStudentModal";
+import NewQueryModal from "./NewQueryModal";
 
 import ConfirmRemovalModal from "./ConfirmRemovalModal";
 
-class StudentList extends Component {
+class QueryList extends Component {
   render() {
-    const students = this.props.students;
+    const home = this.props.home;
     return (
       <Table dark>
         <thead>
           <tr>
-            <th>Query</th>
-            <th>Registration</th>
+            <th>query</th>
+            <th>query_date</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          {!students || students.length <= 0 ? (
+          {!home || home.length <= 0 ? (
             <tr>
               <td colSpan="6" align="center">
-                <b>Ops, no query here yet</b>
+                <b>Ops, no one here yet</b>
               </td>
             </tr>
           ) : (
-            students.map(student => (
-              <tr key={student.pk}>
-                <td>{student.query}</td>
-                <td>{student.registrationDate}</td>
+            home.map(homes => (
+              <tr key={homes.pk}>
+                <td>{homes.query}</td>
+                <td>{homes.query_date}</td>
                 <td align="center">
-                  <NewStudentModal
+                  <NewQueryModal
                     create={false}
-                    student={student}
+                    homes={homes}
                     resetState={this.props.resetState}
                   />
                   &nbsp;&nbsp;
                   <ConfirmRemovalModal
-                    pk={student.pk}
+                    pk={homes.pk}
                     resetState={this.props.resetState}
                   />
                 </td>
@@ -49,4 +49,4 @@ class StudentList extends Component {
   }
 }
 
-export default StudentList;
+export default QueryList;

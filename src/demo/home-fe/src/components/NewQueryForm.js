@@ -5,15 +5,15 @@ import axios from "axios";
 
 import { API_URL } from "../constants";
 
-class NewStudentForm extends React.Component {
+class NewQueryForm extends React.Component {
   state = {
-    pk: 0,
-    query: ""
+      pk:0,
+      query: ""
   };
 
   componentDidMount() {
-    if (this.props.student) {
-      const { pk, query } = this.props.student;
+    if (this.props.homes) {
+      const { pk, query } = this.props.homes;
       this.setState({ pk, query });
     }
   }
@@ -22,7 +22,7 @@ class NewStudentForm extends React.Component {
     this.setState({ [e.target.name]: e.target.value });
   };
 
-  createStudent = e => {
+  createQuery = e => {
     e.preventDefault();
     axios.post(API_URL, this.state).then(() => {
       this.props.resetState();
@@ -30,7 +30,7 @@ class NewStudentForm extends React.Component {
     });
   };
 
-  editStudent = e => {
+  editQuery = e => {
     e.preventDefault();
     axios.put(API_URL + this.state.pk, this.state).then(() => {
       this.props.resetState();
@@ -44,11 +44,11 @@ class NewStudentForm extends React.Component {
 
   render() {
     return (
-      <Form onSubmit={this.props.student ? this.editStudent : this.createStudent}>
+      <Form onSubmit={this.props.homes ? this.editQuery : this.createQuery}>
         <FormGroup>
-          <Label for="phone">Query:</Label>
+          <Label for="query">query:</Label>
           <Input
-            type="text"
+            type="json"
             name="query"
             onChange={this.onChange}
             value={this.defaultIfEmpty(this.state.query)}
@@ -60,4 +60,4 @@ class NewStudentForm extends React.Component {
   }
 }
 
-export default NewStudentForm;
+export default NewQueryForm;

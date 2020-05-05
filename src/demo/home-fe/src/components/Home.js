@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Col, Container, Row } from "reactstrap";
-import StudentList from "./StudentList";
-import NewStudentModal from "./NewStudentModal";
+import QueryList from "./QueryList";
+import NewQueryModal from "./NewQueryModal";
 
 import axios from "axios";
 
@@ -9,19 +9,19 @@ import { API_URL } from "../constants";
 
 class Home extends Component {
   state = {
-    students: []
+    home: []
   };
 
   componentDidMount() {
     this.resetState();
   }
 
-  getStudents = () => {
-    axios.get(API_URL).then(res => this.setState({ students: res.data }));
+  getQuery = () => {
+    axios.get(API_URL).then(res => this.setState({ home: res.data }));
   };
 
   resetState = () => {
-    this.getStudents();
+    this.getQuery();
   };
 
   render() {
@@ -29,15 +29,15 @@ class Home extends Component {
       <Container style={{ marginTop: "20px" }}>
         <Row>
           <Col>
-            <StudentList
-              students={this.state.students}
+            <QueryList
+              home={this.state.home}
               resetState={this.resetState}
             />
           </Col>
         </Row>
         <Row>
           <Col>
-            <NewStudentModal create={true} resetState={this.resetState} />
+            <NewQueryModal create={true} resetState={this.resetState} />
           </Col>
         </Row>
       </Container>

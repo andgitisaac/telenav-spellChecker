@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('query', models.CharField(max_length=200)),
-                ('query_date', models.DateTimeField(verbose_name='date queried')),
+                ('query_date', models.DateField(auto_now_add=True, verbose_name='date queried')),
             ],
         ),
     ]

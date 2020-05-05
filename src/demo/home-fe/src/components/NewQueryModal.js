@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from "react";
 import { Button, Modal, ModalHeader, ModalBody } from "reactstrap";
-import NewStudentForm from "./NewStudentForm";
+import NewQueryForm from "./NewQueryForm";
 
-class NewStudentModal extends Component {
+class NewQueryModal extends Component {
   state = {
     modal: false
   };
@@ -40,10 +40,10 @@ class NewStudentModal extends Component {
           <ModalHeader toggle={this.toggle}>{title}</ModalHeader>
 
           <ModalBody>
-            <NewStudentForm
+            <NewQueryForm
               resetState={this.props.resetState}
               toggle={this.toggle}
-              student={this.props.student}
+              homes={this.props.homes}
             />
           </ModalBody>
         </Modal>
@@ -52,4 +52,4 @@ class NewStudentModal extends Component {
   }
 }
 
-export default NewStudentModal;
+export default NewQueryModal;
