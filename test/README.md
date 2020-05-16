@@ -3,48 +3,28 @@
 A web server for local spell checker. 
 
 ## Environment Setup
-To create conda environment with specific packages (preferred):  
-`$ conda create --name <env_name> --file <this file_name>`  
 
-To activate conda enviroment:  
-`$ conda activate <env>`
+Use venv to create and manage the project for each virtual environment you have.
+`sudo apt install -y python3-venv`
 
-To deactivate an active enviornment:  
-`$ conda deactivate`
+Go to a folder of your choice and create the following folder:
+`mkdir environments`
 
-To install packages:  
-`$ conda install <package_name>`
+Run the command inside this folder to create our venv (remember to always give it a good name):
+`python3 -m venv logrocket_env`
 
-Most of them can be found at anaconda.org, choose the package that still being maintained.  
-DO NOT use `$pip install <package_name>`
-
-To update requirements.txt:  
-`$conda list -e > requirements.txt`  
-Remember to update requirements.txt if new packages are installed.  
-
-To run in local:  
-`$ bash run.sh`
+Make sure the enviornment is activated:
+`source logrocket_env/bin/activate`
 
 ## APIs
+For backend, run the Django application in order to test the endpoints:
+`python manage.py runserver`
 
-Check web page: http://127.0.0.1:5487/.
+After you see the log showing our server is up and running, go to the browser and access http://localhost:8000/api/home/
+For frontend, go to home-fe and run:
+`npm start`
 
-Currently there are 2 apis for testing.  
-CSRF tokens are needed for the POST methods.
+It will automatically open the browser in the http://localhost:3000/ url. 
 
-* home/index
-    * GET:
-        * Return all the queries in the DB.
 
-* home/add_query
-    * POST:
-        * Return 201 and add the query in the DB.
-        * Usage:  
-        ```py
-        Requested json format: {"query": <query>}
-        ```
 
-    * GET:
-        * <font color="#dd0000">Will be disabled later</font><br/>
-        * Return 200 and the query in the request.
-        * Usage: Add `?query=<query>` to the url.   
