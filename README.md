@@ -60,10 +60,7 @@ To run in local:
 
 Check web page: http://127.0.0.1:5487/.
 
-Currently there are 2 apis for testing.  
-CSRF tokens are needed for the POST methods.
-
-* home/index
+* home/history
     * GET:
         * Return all the queries in the DB.
 
@@ -75,7 +72,21 @@ CSRF tokens are needed for the POST methods.
         Requested json format: {"query": <query>}
         ```
 
-    * GET:
-        * <font color="#dd0000">Will be disabled later</font><br/>
-        * Return 200 and the query in the request.
-        * Usage: Add `?query=<query>` to the url.   
+* home/search
+    * POST:
+        * Return list of (word, [candidates])
+        ```
+        For example
+
+        Input: "5000 1st N ave."
+        Return: [
+            ["5000", ["5000"]],
+            ["1st", ["st", "1st", "21st"]],
+            ["n", ["a", "in", "i", "ln"]],
+            ["ave", ["ave", "have"]]
+        ]
+        ```
+
+        * Usage:  
+        ```
+        Requested json format: {"query": <query>}
