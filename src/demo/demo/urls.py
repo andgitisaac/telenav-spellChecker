@@ -19,8 +19,8 @@ from home import views
 from django.conf.urls import url
 
 urlpatterns = [
-    path('home/', include("home.urls")),
+    #path('home/', include("home.urls")),
     path('admin/', admin.site.urls),
-    #re_path(r'^api/home/$', views.init_db),
-    #re_path(r'^api/home/(?P<pk>[0-9]+)$', views.index),
+    re_path(r'^api/home/$', views.history),
+    re_path(r'^api/home/(?P<pk>[0-9]+)$', views.search),
 ]

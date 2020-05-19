@@ -5,11 +5,18 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 from django.utils import timezone
 import json
 
-from .models import UserQuery
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework import status
 
+from .models import UserQuery
+from .serializers import *
+from . import address_checker
 
 # Create your views here.
 
+'''
+# 1st version works for backend
 @require_POST
 def init_db(request):
     test_cases = [
@@ -78,3 +85,77 @@ def add_query(request):
 
     else:
         return HttpResponse(status=405)
+'''
+
+'''
+# 2nd version works for non table web demo
+@api_view(['GET', 'POST'])
+def init_db(request):
+    if request.method == 'GET':
+        data = UserQuery.objects.all()
+
+        serializer = UserQuerySerializer(data, context={'request': request}, many=True)
+
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = UserQuerySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT', 'DELETE'])
+def index(request, pk):
+    try:
+        homes = UserQuery.objects.get(pk=pk)
+    except UserQuery.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'PUT':
+        serializer = UserQuerySerializer(homes, data=request.data,context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        homes.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+'''
+
+@api_view(['GET', 'POST'])
+def history(request):
+    if request.method == 'GET':
+        data = UserQuery.objects.all()
+
+        serializer = UserQuerySerializer(data, context={'request': request}, many=True)
+
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = UserQuerySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT', 'DELETE'])
+def search(request, pk):
+    try:
+        homes = UserQuery.objects.get(pk=pk)
+    except UserQuery.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'PUT':
+        serializer = UserQuerySerializer(homes, data=request.data,context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        homes.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
