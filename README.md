@@ -58,7 +58,7 @@ To run in local:
 
 ## APIs
 
-Check web page: http://127.0.0.1:5487/.
+Check web page: http://127.0.0.1:8000/.
 
 * home/history
     * GET:
@@ -79,7 +79,8 @@ Check web page: http://127.0.0.1:5487/.
         For example
 
         Input: "5000 1st N ave."
-        Return: [
+        Return (Json serialized): 
+        [
             ["5000", ["5000"]],
             ["1st", ["st", "1st", "21st"]],
             ["n", ["a", "in", "i", "ln"]],
