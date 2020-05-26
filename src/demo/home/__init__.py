@@ -1,3 +1,3 @@
-from .addresschecker.addresschecker import AddressChecker
+from .addresschecker import AddressChecker
 
 address_checker = AddressChecker()

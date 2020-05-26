@@ -12,7 +12,7 @@ DEFAULT_DICTIONARY_NAME = "en.char.json.gz"
 class AddressChecker(object):
     __slots__ = ["_distance", "_tokenizer", "_case_sensitive", "_word_frequency"]
         
-    def __init__(self, distance=2, tokenizer=None, case_sensitive=False):
+    def __init__(self, distance=2, tokenizer=None, case_sensitive=False, dictionary_name=None):
         """ The AddressChecker is used to correct the misspellings in the \
             address string. The algorithm is based on the work of Peter Norvig \
             (https://norvig.com/spell-correct.html).
@@ -22,6 +22,8 @@ class AddressChecker(object):
             tokenizer {function} -- The method to tokenize string. (default: {None})
             case_sensitive {bool} -- Whether to treat the word in dictionary \
                 case-sensitive or not. (default: {False})
+            dictionary_name {[str]} -- The path to the word dictionary under resources/. \
+                (default: {en.char.json.gz})
         """
         
         self.distance = distance
@@ -29,7 +31,11 @@ class AddressChecker(object):
         self._case_sensitive = case_sensitive
         self._word_frequency = WordFrequency(self._tokenizer, self._case_sensitive)
 
-        self.load_dictionary()
+
+        # Currently, we focus on the addresses in English only.
+        if not dictionary_name:
+            dictionary_name = DEFAULT_DICTIONARY_NAME
+        self.load_dictionary(dictionary_name=dictionary_name)
 
     def __contains__(self, key):
         """ Check if the word is in the dictionary.
@@ -91,10 +97,6 @@ class AddressChecker(object):
         Raises:
             ValueError: if the language dictionary does not exist.
         """
-
-        # Currently, we focus on the addresses in English only.
-        if not dictionary_name:
-            dictionary_name = DEFAULT_DICTIONARY_NAME
 
         here = os.path.dirname(__file__)
         full_filename = os.path.join(here, "resources", dictionary_name)
@@ -237,7 +239,7 @@ class AddressChecker(object):
                 for w2 in self.edit_distance_1(w1)
         )
 
-    def _candidates(self, word):
+    def candidates(self, word):
         """ Helper of returning all of the potential spelling corrections of \
             a word according to the edit distance.
 
@@ -249,6 +251,8 @@ class AddressChecker(object):
         """
         word = ENSURE_UNICODE(word)
         if not self._need_check(word):
+            return set([word])
+        if word in self._word_frequency._valid_abbreviation:
             return set([word])
         
         # Obtain edit dist 1 candidates
@@ -310,7 +314,7 @@ class AddressChecker(object):
             raise ValueError("Invalid method for word score calculation.")
 
         word = ENSURE_UNICODE(word)
-        candidates = list(self._candidates(word))
+        candidates = list(self.candidates(word))
         candidates = sorted(
             candidates,
             reverse=True,
@@ -337,13 +341,13 @@ class AddressChecker(object):
         """
         score = 0.0
         if method == "naive":
-            score = self.word_score_naive(word)
+            score = self._word_score_naive(word)
         else:
             raise ValueError("Invalid method for word score calculation.")
             
         return score        
 
-    def word_score_naive(self, word):
+    def _word_score_naive(self, word):
         """ Calculate the probability of the word in the dict.
 
         Arguments:
@@ -360,6 +364,7 @@ class AddressChecker(object):
 class WordFrequency(object):
     __slots__ = [
         "_valid_char",
+        "_valid_abbreviation",
         "_dictionary",
         "_total_words",
         "_unique_words",
@@ -379,6 +384,10 @@ class WordFrequency(object):
         """
        
         self._valid_char = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-\'\"0123456789.()')
+        self._valid_abbreviation = set(abbr.lower() for abbr in [
+            'NW', 'NE', 'SW', 'SE', 'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', \
+            'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', \
+            'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY', 'Ave', 'Rd', 'St', 'Ln', 'Dr', 'Way', 'Blvd'])
 
         self._dictionary = Counter()
         self._total_words = 0
@@ -387,40 +396,25 @@ class WordFrequency(object):
         self._case_sensitive = case_sensitive
         self._longest_word_length = 0
         self._tokenizer = _parse_into_words if not tokenizer else tokenizer
-    
+
+    def __str__(self):
+        return "Unique words: {}\t Thresholding: {}\t".format(self._unique_words, min(self._dictionary))
+
     def __contains__(self, key):
-        """ Check if the word is in the dictionary.
-
-        Arguments:
-            key {[string]} -- Word needs to be checked.
-
-        Returns:
-            [bool] -- Whether the word is in the dict.
-        """
         key = ENSURE_UNICODE(key)
         if not self._case_sensitive:
             key = key.lower()
-            
         return key in self._dictionary    
 
     def __getitem__(self, key):
-        """ Get the frequency of the word in the dictionary.
-
-        Arguments:
-            key {[string]} -- The query word.
-
-        Returns:
-            [int] -- Frequency of the word in the dict. \
-                Return 0 if it's not in the dict.
-        """
         key = ENSURE_UNICODE(key)
         if not self._case_sensitive:
-            key = key.lower()
-            
+            key = key.lower()    
         return self._dictionary.get(key, 0)    
 
     def __str__(self):
-        return "Total words: {}\t Unique words: {}".format(self._total_words, self._unique_words)
+        th = self._dictionary[min(self._dictionary, key=self._dictionary.get)]
+        return "Total words: {}\t Unique words: {}\t Thresholding: {}\t".format(self._total_words, self._unique_words, th)
     
     @property
     def dictionary(self):
@@ -523,10 +517,14 @@ class WordFrequency(object):
             filename {[str]} -- Filename of the dictionary.
             encoding {str} -- The encoding method. (default: {"utf-8"})
         """
+        print("Loading Dictionary: {}".format(filename))
+
         with load_file(filename, encoding) as data:
             data = data if self._case_sensitive else data.lower()
             self._dictionary.update(json.loads(data, encoding=encoding))
             self._update_dictionary()
+
+        print("Dictionary Loaded!")
 
     def load_text_file(self, filename, encoding="utf-8", tokenizer=None):
         """ Load from a text file to build the dictionary.
@@ -538,6 +536,10 @@ class WordFrequency(object):
         """
         with load_file(filename, encoding=encoding) as data:
             self._load_text(data, tokenizer)
+            
+    def load_sentence(self, sentences, encoding='utf-8', tokenizer=None):
+        for sentence in sentences:
+            self._load_text(sentence, tokenizer)
 
     def _load_text(self, text, tokenizer=None):
         """ Process the text in the text file to build the dictionary.
