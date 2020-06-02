@@ -3,7 +3,7 @@ import { Button, Form, FormGroup, Input, Label } from "reactstrap";
 
 import axios from "axios";
 
-import { API_URL } from "../constants";
+import { API_URL, API_URL_ADD } from "../constants";
 
 class NewQueryForm extends React.Component {
   state = {
@@ -24,19 +24,21 @@ class NewQueryForm extends React.Component {
 
   createQuery = e => {
     e.preventDefault();
-    axios.post(API_URL, this.state).then(() => {
+    axios.post(API_URL_ADD, this.state).then(() => {
       this.props.resetState();
       this.props.toggle();
     });
   };
 
+/*
   editQuery = e => {
     e.preventDefault();
-    axios.put(API_URL + this.state.pk, this.state).then(() => {
+    axios.put(API_URL_ADD + this.state.pk, this.state).then(() => {
       this.props.resetState();
       this.props.toggle();
     });
   };
+*/
 
   defaultIfEmpty = value => {
     return value === "" ? "" : value;

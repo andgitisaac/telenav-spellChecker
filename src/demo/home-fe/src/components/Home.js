@@ -6,7 +6,9 @@ import ReactDOM from "react-dom";
 
 import axios from "axios";
 
-import { API_URL } from "../constants";
+import { API_URL, API_URL_ADD, API_URL_SEARCH} from "../constants";
+
+var callbackQuery
 
 class Home extends Component {
   constructor(props) {
@@ -14,6 +16,7 @@ class Home extends Component {
     this.state = {
       home: [],
       queryString: "",
+      resultString: "",
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -35,21 +38,112 @@ class Home extends Component {
   handleInputChange(event) {
     console.log(event.target.value);
     this.setState({ queryString: event.target.value });
+  };
+
+  splitResponseData(data) {
+    var initArray = data.split("]],");
+    for(var i = 0; i < initArray.length; i++) {
+      initArray[i] = initArray[i].replace(/\[/g, '').replace(/\]/g, '').replace(/\"/g, '')
+    }
+    return initArray;
   }
 
-  handleSubmit(event) {
-    console.log(this.state.queryString);
-    var callbackQuery = this.state.queryString;
-    // Make API call using callbackQuery string
-    // Modify HTML element below based on API response
+  splitUnitData(initArray){
+    var newArray = []
+    for(var i = 0; i < initArray.length; i++) {
+      var splitInitArray = initArray[i].split(",")
+      newArray.push(splitInitArray)
+    }
 
-    const element = (
-      <div>
-        <h1>Hello, world!</h1>
-        <h2>You queried the string {callbackQuery}.</h2>
-      </div>
-    );
-    ReactDOM.render(element, document.getElementById("bottomdiv"));
+    for (var i = 0; i < newArray.length; i++){ 
+      if (newArray[i].length < 11) {
+        var length = 11 - newArray[i].length
+        for (var j = 0; j < length; j++){
+          newArray[i].push("N/A")
+        }
+      }
+    }
+    return newArray;
+  }
+
+  createTable(tableData) { 
+    if (document.getElementById("1")) {
+      document.getElementById("1").remove();
+    }
+
+    var table = document.createElement('table');
+    table.setAttribute("id", "1");
+    table.style.alignContent = "center"
+    var tableBody = document.createElement('tbody');
+    tableBody.setAttribute('style', 'text-align: center')
+        
+  
+    tableData.forEach(function(rowData) {
+      var row = document.createElement('tr');
+
+      rowData.forEach(function(cellData) {
+        var cell = document.createElement('td');
+        cell.setAttribute('style', 'text-align: center')
+        cell.appendChild(document.createTextNode(cellData));
+        row.appendChild(cell);
+      });
+  
+      tableBody.appendChild(row);
+    });
+  
+    table.appendChild(tableBody);
+    document.body.appendChild(table);
+  }
+  
+  renderTableData(dataArray){
+    var column = dataArray.length
+    var testArray = this.splitUnitData(dataArray)
+
+    var table = []
+    for (var i = 0; i < 11; i++){
+      var newArray = []
+      for (var j = 0; j < column; j++) {
+        newArray.push(testArray[j][i])
+      }
+      table.push(newArray)
+    }
+    console.log(testArray)
+    console.log(table)
+
+    this.createTable(table)
+  }
+
+  async handleSubmit(event) {
+    callbackQuery = this.state.queryString;
+    axios({method:'post',
+          url:API_URL_ADD,
+          data: {"query": callbackQuery,},
+          headers: {
+            'Content-Type': 'application/json',
+          }})
+
+    axios({method:'post',
+          url:API_URL_SEARCH,
+          data: {"query": callbackQuery,},
+          headers: {
+            'Content-Type': 'application/json',
+          }}).then(response => {
+            //this.setState({resultString: response.data})
+            this.state.resultString = response.data
+            console.log(this.splitResponseData(this.state.resultString))
+            var address = this.splitResponseData(this.state.resultString)
+            this.renderTableData(address)
+            // const element = (
+            //   // <tr>
+            //   //   <td>
+            //   //     {this.state.resultString}
+              
+            //   this.renderTableData(address)
+            //   //   </td>
+            //   // </tr>
+            // );
+            // ReactDOM.render(element, document.getElementById("bottomtable"));
+          })
   }
 
   render() {
@@ -66,13 +160,13 @@ class Home extends Component {
           </Col>
         </Row>
         <hr />
-        <h1> TYANS STUFF XD </h1>
+        <h1> Please type in your address </h1>
         <Row>
           <div class="input-group mb-3">
             <input
               type="text"
               class="form-control"
-              placeholder="Query"
+              placeholder="address"
               aria-label="Recipient's username"
               aria-describedby="basic-addon2"
               onChange={this.handleInputChange}
@@ -88,8 +182,17 @@ class Home extends Component {
               </button>
             </div>
           </div>
-          <div id="bottomdiv"></div>
+          
         </Row>
+        <div>
+          <h1 id='title'> Address Breakdown</h1>
+          {this.handleSubmit}
+          <table id='home'>
+            <tbody id="bottomtable">
+              {/* {this.renderTableData()} */}
+            </tbody>
+          </table>
+        </div>
       </Container>
     );
   }

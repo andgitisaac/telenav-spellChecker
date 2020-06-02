@@ -24,7 +24,7 @@ To install all packages:
 For backend, go to src/demo to run the Django application in order to test the endpoints:
 `python manage.py runserver`
 
-After you see the log showing our server is up and running, go to the browser and access http://localhost:8000/api/home/
+After you see the log showing our server is up and running, go to the browser and access http://localhost:8000/home/history/
 
 For frontend, go to home-fe and run:
 `npm start --prefix src/demo/home-fe`
