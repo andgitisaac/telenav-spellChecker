@@ -2,8 +2,8 @@
 
 A web server for local spell checker. 
 
-
-## Environment Setup for venv
+## Setup
+### Environment Setup for venv
 
 Use venv to create and manage the project for each virtual environment you have.
 `sudo apt install -y python3-venv`
@@ -25,7 +25,7 @@ Note: Once inside a venv, you can use the commands pip or python normally. If yo
 
 That’s it. You’re good to go with your venv.
 
-## Django Installation
+### Django Installation
 For Django installation, you need to run the following command inside of your venv:
 
 `pip install django djangorestframework django-cors-headers`
@@ -36,11 +36,11 @@ Note that we’re installing two more dependencies for our API:
 
 This is going to be useful when we try to access the API from front end (React).
 
-## APIs
+### APIs
 For backend, go to src/demo to run the Django application in order to test the endpoints:
 `python manage.py runserver`
 
-After you see the log showing our server is up and running, go to the browser and access http://localhost:8000/home/
+After you see the log showing our server is up and running, go to the browser and access http://localhost:8000/home/history/, http://localhost:8000/home/add_query/ and http://localhost:8000/home/search/.
 
 For frontend, go to home-fe and run:
 `npm start --prefix src/demo/home-fe`
@@ -86,7 +86,7 @@ Check web page: http://127.0.0.1:8000/.
 
 ## Others
 This project front end was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-This project whole work was credit from https://blog.logrocket.com/creating-an-app-with-react-and-django/.
+This project credit from https://blog.logrocket.com/creating-an-app-with-react-and-django/.
 
 ## Available Scripts for front end
 
