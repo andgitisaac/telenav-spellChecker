@@ -30,7 +30,7 @@ class NewQueryForm extends React.Component {
     });
   };
 
-/*
+
   editQuery = e => {
     e.preventDefault();
     axios.put(API_URL_ADD + this.state.pk, this.state).then(() => {
@@ -38,7 +38,7 @@ class NewQueryForm extends React.Component {
       this.props.toggle();
     });
   };
-*/
+
 
   defaultIfEmpty = value => {
     return value === "" ? "" : value;

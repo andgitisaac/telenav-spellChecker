@@ -15,13 +15,22 @@ from . import address_checker
 
 # Create your views here.
 
+@api_view(["DELETE"])
+def delete(request):
+    import pdb; pdb.set_trace()
+    return
+
 @api_view(["GET"])
 def history(request):
-    data = UserQuery.objects.all()
-    serializer = UserQuerySerializer(data, context={'request': request}, many=True)
+    # import pdb; pdb.set_trace()
+    if (request.method == "GET"):
+        data = UserQuery.objects.all()
+        serializer = UserQuerySerializer(data, context={'request': request}, many=True)
+        return Response(serializer.data)
 
-    return Response(serializer.data)
-
+    # elif (request.mehtod == 'DELETE'):
+    #     print('Deleting history')
+    #     import pdb; pdb.set_trace()
 
 @api_view(["POST"])
 def add_query(request):

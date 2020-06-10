@@ -3,6 +3,7 @@ import { Col, Container, Row } from "reactstrap";
 import QueryList from "./QueryList";
 import NewQueryModal from "./NewQueryModal";
 import ReactDOM from "react-dom";
+import { Link } from 'react-router-dom';
 
 import axios from "axios";
 
@@ -59,7 +60,7 @@ class Home extends Component {
       if (newArray[i].length < 11) {
         var length = 11 - newArray[i].length
         for (var j = 0; j < length; j++){
-          newArray[i].push("N/A")
+          newArray[i].push(" ")
         }
       }
     }
@@ -73,9 +74,8 @@ class Home extends Component {
 
     var table = document.createElement('table');
     table.setAttribute("id", "1");
-    table.style.alignContent = "center"
+    table.style.margin = "auto"
     var tableBody = document.createElement('tbody');
-    tableBody.setAttribute('style', 'text-align: center')
         
   
     tableData.forEach(function(rowData) {
@@ -83,7 +83,6 @@ class Home extends Component {
 
       rowData.forEach(function(cellData) {
         var cell = document.createElement('td');
-        cell.setAttribute('style', 'text-align: center')
         cell.appendChild(document.createTextNode(cellData));
         row.appendChild(cell);
       });
@@ -149,7 +148,10 @@ class Home extends Component {
   render() {
     return (
       <Container style={{ marginTop: "20px" }}>
-        <Row>
+        <main>
+          <Link to="/database">Go to Database</Link>
+        </main>
+        {/* <Row>
           <Col>
             <QueryList home={this.state.home} resetState={this.resetState} />
           </Col>
@@ -158,9 +160,9 @@ class Home extends Component {
           <Col>
             <NewQueryModal create={true} resetState={this.resetState} />
           </Col>
-        </Row>
+        </Row> */}
         <hr />
-        <h1> Please type in your address </h1>
+        <h1 style={{textAlign: "center"}}> Please type in your address </h1>
         <Row>
           <div class="input-group mb-3">
             <input
@@ -185,13 +187,8 @@ class Home extends Component {
           
         </Row>
         <div>
-          <h1 id='title'> Address Breakdown</h1>
-          {this.handleSubmit}
-          <table id='home'>
-            <tbody id="bottomtable">
-              {/* {this.renderTableData()} */}
-            </tbody>
-          </table>
+          <h1 style={{textAlign: "center"}} id='title'> Address Breakdown</h1>
+          <div>{this.handleSubmit}</div>
         </div>
       </Container>
     );
